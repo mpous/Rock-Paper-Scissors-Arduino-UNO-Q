@@ -1,0 +1,10 @@
+name: Rock Paper Scissors
+description: "Rock-Paper-Scissors game with Edge Impulse object detection on Arduino UNO Q"
+icon: "✂️"
+ports: [5001]
+bricks:
+- arduino:video_object_detection: {
+    variables: {
+      EI_OBJ_DETECTION_MODEL: /home/arduino/.arduino-bricks/ei-models/rcp-model.eim
+    }
+  }

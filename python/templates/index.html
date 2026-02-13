@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #fff;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 12px;
+        }
+        .header img { height: 28px; }
+        .header h1 {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Scoreboard ── */
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 16px;
+            gap: 36px;
+        }
+        .score-block { text-align: center; }
+        .score-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+        .score-value {
+            font-size: 48px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+        .score-divider {
+            font-size: 28px;
+            color: #ddd;
+            font-weight: 300;
+        }
+
+        /* ── Panels ── */
+        .panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 0 16px;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        .panel {
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            background: #fafafa;
+        }
+        .panel-label {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            padding: 6px 12px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #999;
+            background: rgba(255,255,255,0.85);
+            z-index: 2;
+        }
+        .move-display {
+            aspect-ratio: 4 / 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .move-emoji {
+            font-size: 100px;
+            line-height: 1;
+        }
+        .move-name {
+            font-size: 14px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+
+        /* ── Detection panel (left) ── */
+        .detect-display {
+            aspect-ratio: 4 / 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #111;
+            color: #fff;
+            transition: background 0.3s;
+        }
+        .detect-display.active {
+            background: #0a2e1a;
+        }
+        .detect-display.locked {
+            background: #1a1a3e;
+        }
+        .detect-display.locked .detect-label {
+            color: #93c5fd;
+        }
+        .detect-display.locked .detect-conf {
+            color: #93c5fd;
+        }
+        .detect-emoji {
+            font-size: 100px;
+            line-height: 1;
+            opacity: 0.25;
+            transition: opacity 0.3s;
+        }
+        .detect-display.active .detect-emoji {
+            opacity: 1;
+        }
+        .detect-label {
+            font-size: 14px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+            transition: color 0.3s;
+        }
+        .detect-display.active .detect-label {
+            color: #4ade80;
+        }
+        .detect-conf {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+        .detect-display.active .detect-conf {
+            color: #86efac;
+        }
+
+        /* ── Countdown ── */
+        .move-emoji.countdown-num {
+            font-size: 110px;
+            font-weight: 800;
+            font-family: inherit;
+            color: #dc2626;
+            animation: pop 0.35s ease-out;
+        }
+        @keyframes pop {
+            0%   { transform: scale(1.5); opacity: 0.3; }
+            100% { transform: scale(1);   opacity: 1; }
+        }
+
+        /* ── Result Banner ── */
+        .result-banner {
+            text-align: center;
+            padding: 14px 16px;
+            margin: 16px auto 0;
+            max-width: 960px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            display: none;
+        }
+        .result-banner.show { display: block; }
+        .result-banner.human   { background: #dcfce7; color: #166534; }
+        .result-banner.arduino { background: #fee2e2; color: #991b1b; }
+        .result-banner.draw    { background: #fef3c7; color: #92400e; }
+        .result-banner.error   { background: #fce4ec; color: #880e4f; }
+
+        /* ── Controls ── */
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 16px 8px;
+        }
+        .btn-play {
+            padding: 12px 36px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: #fff;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            transition: opacity 0.15s;
+        }
+        .btn-play:hover { opacity: 0.85; }
+        .btn-play:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        /* ── History ── */
+        .history {
+            max-width: 960px;
+            margin: 16px auto 0;
+            padding: 0 16px;
+        }
+        .history h2 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+        .history table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .history th {
+            text-align: left;
+            padding: 8px 10px;
+            border-bottom: 2px solid #f0f0f0;
+            color: #999;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .history td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f8f8f8;
+        }
+        .history tbody tr:hover { background: #fafafa; }
+        .res-win  { color: #16a34a; font-weight: 600; }
+        .res-lose { color: #dc2626; font-weight: 600; }
+        .res-draw { color: #d97706; font-weight: 600; }
+        .res-none { color: #999; }
+        .no-history {
+            text-align: center;
+            color: #ccc;
+            padding: 20px;
+            font-size: 13px;
+        }
+
+        /* ── Reset ── */
+        .footer {
+            text-align: center;
+            padding: 16px 16px 32px;
+        }
+        .btn-reset {
+            padding: 8px 24px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: #fff;
+            color: #999;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.15s;
+        }
+        .btn-reset:hover { border-color: #dc2626; color: #dc2626; }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .panels { grid-template-columns: 1fr; }
+            .score-value { font-size: 36px; }
+            .scoreboard { gap: 24px; padding: 16px; }
+            .move-emoji, .detect-emoji { font-size: 80px; }
+            .controls { flex-direction: column; }
+            .btn-play { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <img src="https://cdn.prod.website-files.com/618cdeef45d18e4ef2fd85f3/618e33d89badebdfe7c5897a_Logo%20(2).svg" alt="Edge Impulse">
+        <h1>Rock Paper Scissors</h1>
+    </div>
+
+    <!-- Scoreboard -->
+    <div class="scoreboard">
+        <div class="score-block">
+            <div class="score-label">Human</div>
+            <div class="score-value" id="humanScore">0</div>
+        </div>
+        <div class="score-divider">&mdash;</div>
+        <div class="score-block">
+            <div class="score-label">Arduino</div>
+            <div class="score-value" id="arduinoScore">0</div>
+        </div>
+    </div>
+
+    <!-- Game Panels -->
+    <div class="panels">
+        <!-- Detection Panel (brick feeds live detection here) -->
+        <div class="panel">
+            <div class="panel-label">Your Hand</div>
+            <div class="detect-display" id="detectPanel">
+                <div class="detect-emoji" id="detectEmoji">&#x270B;</div>
+                <div class="detect-label" id="detectLabel">Show your hand</div>
+                <div class="detect-conf" id="detectConf">&nbsp;</div>
+            </div>
+        </div>
+        <!-- Arduino Move Panel -->
+        <div class="panel">
+            <div class="panel-label">Arduino</div>
+            <div class="move-display">
+                <div class="move-emoji" id="moveEmoji">&#x2753;</div>
+                <div class="move-name" id="moveName">waiting</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Banner -->
+    <div class="result-banner" id="resultBanner"></div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn-play" id="playBtn" onclick="playRound()">Play Round</button>
+    </div>
+
+    <!-- History -->
+    <div class="history">
+        <h2>Move History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Human</th>
+                    <th>Arduino</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody id="histBody"></tbody>
+        </table>
+        <div class="no-history" id="noHist">No rounds played yet</div>
+    </div>
+
+    <!-- Reset -->
+    <div class="footer">
+        <button class="btn-reset" onclick="resetGame()">Reset Game</button>
+    </div>
+
+<script>
+var EMOJIS = {
+    Rock:     '\uD83E\uDEA8',
+    Paper:    '\uD83D\uDCC4',
+    Scissors: '\u2702\uFE0F'
+};
+
+var RESULT_MSG = {
+    human:        'You win!',
+    arduino:      'Arduino wins!',
+    draw:         'Draw!',
+    no_detection: 'No gesture detected'
+};
+
+var prevState = '';
+
+/* ── Poll state ── */
+function poll() {
+    fetch('/api/state')
+        .then(function(r) { return r.json(); })
+        .then(update)
+        .catch(function() {});
+    setTimeout(poll, 500);
+}
+
+/* ── Update UI ── */
+function update(s) {
+    document.getElementById('humanScore').textContent = s.humanWins;
+    document.getElementById('arduinoScore').textContent = s.arduinoWins;
+
+    var emoji = document.getElementById('moveEmoji');
+    var name  = document.getElementById('moveName');
+    var btn   = document.getElementById('playBtn');
+
+    btn.disabled = (s.state !== 'idle');
+
+    /* ── Detection panel ── */
+    var dPanel = document.getElementById('detectPanel');
+    var dEmoji = document.getElementById('detectEmoji');
+    var dLabel = document.getElementById('detectLabel');
+    var dConf  = document.getElementById('detectConf');
+    var isLocked = (s.state === 'countdown' || s.state === 'evaluating' || s.state === 'result');
+
+    if (isLocked && s.detection && s.confidence > 0) {
+        var cap = s.detection.charAt(0).toUpperCase() + s.detection.slice(1);
+        dPanel.className = 'detect-display locked';
+        dEmoji.textContent = EMOJIS[cap] || '\u270B';
+        dLabel.textContent = cap + ' — locked in!';
+        dConf.textContent = Math.round(s.confidence * 100) + '% confidence';
+    } else if (isLocked) {
+        dPanel.className = 'detect-display locked';
+        dEmoji.textContent = '\u270B';
+        dLabel.textContent = 'No gesture — locked';
+        dConf.innerHTML = '&nbsp;';
+    } else if (s.detection && s.confidence > 0) {
+        var cap = s.detection.charAt(0).toUpperCase() + s.detection.slice(1);
+        dPanel.className = 'detect-display active';
+        dEmoji.textContent = EMOJIS[cap] || '\u270B';
+        dLabel.textContent = cap;
+        dConf.textContent = Math.round(s.confidence * 100) + '% confidence';
+    } else {
+        dPanel.className = 'detect-display';
+        dEmoji.textContent = '\u270B';
+        dLabel.textContent = 'Show your hand';
+        dConf.innerHTML = '&nbsp;';
+    }
+
+    /* ── Arduino panel ── */
+    if (s.state === 'countdown' && s.countdown != null) {
+        emoji.textContent = s.countdown;
+        emoji.className = 'move-emoji countdown-num';
+        name.textContent = 'get ready';
+        hideBanner();
+    }
+    else if ((s.state === 'evaluating' || s.state === 'result') && s.winner) {
+        emoji.textContent = EMOJIS[s.arduinoMove] || '?';
+        emoji.className = 'move-emoji';
+        name.textContent = s.arduinoMove || '';
+
+        var cls = s.winner === 'human' ? 'human' :
+                  s.winner === 'arduino' ? 'arduino' :
+                  s.winner === 'draw' ? 'draw' : 'error';
+
+        var msg = RESULT_MSG[s.winner] || '';
+        if (s.winner === 'human') {
+            msg += ' ' + (EMOJIS[s.humanMove] || '') + ' ' +
+                   (s.humanMove || '') + ' beats ' +
+                   (EMOJIS[s.arduinoMove] || '') + ' ' +
+                   (s.arduinoMove || '');
+        } else if (s.winner === 'arduino') {
+            msg += ' ' + (EMOJIS[s.arduinoMove] || '') + ' ' +
+                   (s.arduinoMove || '') + ' beats ' +
+                   (EMOJIS[s.humanMove] || '') + ' ' +
+                   (s.humanMove || '');
+        } else if (s.winner === 'draw') {
+            msg += ' Both chose ' + (EMOJIS[s.arduinoMove] || '') +
+                   ' ' + (s.arduinoMove || '');
+        }
+        showBanner(msg, cls);
+    }
+    else {
+        emoji.textContent = '\u2753';
+        emoji.className = 'move-emoji';
+        name.textContent = 'waiting';
+        if (s.state === 'idle' && prevState === 'result') {
+            /* keep banner visible until next play */
+        } else if (s.state === 'idle' && prevState === 'idle' && s.round === 0) {
+            hideBanner();
+        }
+    }
+
+    prevState = s.state;
+
+    /* ── History ── */
+    updateHistory(s.history);
+}
+
+function showBanner(text, cls) {
+    var b = document.getElementById('resultBanner');
+    b.textContent = text;
+    b.className = 'result-banner show ' + cls;
+}
+
+function hideBanner() {
+    document.getElementById('resultBanner').className = 'result-banner';
+}
+
+function updateHistory(history) {
+    var tbody = document.getElementById('histBody');
+    var noMsg = document.getElementById('noHist');
+    if (!history || history.length === 0) {
+        tbody.innerHTML = '';
+        noMsg.style.display = 'block';
+        return;
+    }
+    noMsg.style.display = 'none';
+    var html = '';
+    for (var i = 0; i < history.length; i++) {
+        var r = history[i];
+        var cls = r.winner === 'human' ? 'res-win' :
+                  r.winner === 'arduino' ? 'res-lose' :
+                  r.winner === 'draw' ? 'res-draw' : 'res-none';
+        var resText = r.winner === 'human' ? 'Win' :
+                      r.winner === 'arduino' ? 'Loss' :
+                      r.winner === 'draw' ? 'Draw' : 'N/A';
+        var hm = r.humanMove ? (EMOJIS[r.humanMove] || '') + ' ' + r.humanMove : '\u2014';
+        var am = r.arduinoMove ? (EMOJIS[r.arduinoMove] || '') + ' ' + r.arduinoMove : '\u2014';
+        html += '<tr><td>' + r.round + '</td><td>' + hm +
+                '</td><td>' + am + '</td><td class="' + cls + '">' + resText + '</td></tr>';
+    }
+    tbody.innerHTML = html;
+}
+
+/* ── Actions ── */
+function playRound() {
+    document.getElementById('playBtn').disabled = true;
+    hideBanner();
+    fetch('/api/play', { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.status === 'busy') {
+                document.getElementById('playBtn').disabled = false;
+            }
+        })
+        .catch(function() {
+            document.getElementById('playBtn').disabled = false;
+        });
+}
+
+function resetGame() {
+    fetch('/api/reset', { method: 'POST' })
+        .then(function() {
+            document.getElementById('humanScore').textContent = '0';
+            document.getElementById('arduinoScore').textContent = '0';
+            document.getElementById('histBody').innerHTML = '';
+            document.getElementById('noHist').style.display = 'block';
+            document.getElementById('moveEmoji').textContent = '\u2753';
+            document.getElementById('moveName').textContent = 'waiting';
+            hideBanner();
+        });
+}
+
+/* ── Init ── */
+poll();
+</script>
+
+</body>
+</html>
