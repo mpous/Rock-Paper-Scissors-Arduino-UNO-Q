@@ -2,6 +2,8 @@
 
 A real-time Rock-Paper-Scissors game running on the Arduino UNO Q using an Edge Impulse object detection model and the Arduino App Lab bricks system.
 
+<img width="1624" height="1056" alt="Playing Rock Paper Scissors against Arduino UNO Q" src="https://github.com/user-attachments/assets/4a424e48-33d7-4b16-a3ca-eb47b1708bb3" />
+
 The camera detects your hand gesture (rock, paper, or scissors) via machine learning inference, while the Arduino picks a random move. A web UI served on port 5001 lets you play rounds, track scores, and view move history.
 
 ## How It Works
