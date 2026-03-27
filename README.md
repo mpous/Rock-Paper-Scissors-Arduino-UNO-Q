@@ -1,4 +1,4 @@
-# Rock Paper Scissors — Arduino UNO Q
+# Rock Paper Scissors Game with Arduino UNO Q
 
 A real-time Rock-Paper-Scissors game running on the Arduino UNO Q using an Edge Impulse object detection model.
 
@@ -15,7 +15,7 @@ The camera detects your hand gesture (rock, paper, or scissors) via machine lear
 - USB camera connected to the board
 - [Edge Impulse](https://edgeimpulse.com/) machine learning model trained to detect `rock`, `paper`, and `scissors` as you can find in this public project [here](https://studio.edgeimpulse.com/public/903134/live). Clone it and re-train it to improve the accuracy with your light and background.
 
-### Step 1: Transfer the App
+### Step 1: Transfer the app
 
 Clone this repository to your local machine.
 
@@ -30,7 +30,7 @@ or use the Arduino App Lab `Create new App` button in the `My Apps` section and 
 ![Create new app](assets/img/arduino-app-lab-create-new-app.png)
 
 
-### Step 2: Deploy the Model
+### Step 2: Deploy the model
 
 Get into the `Rock Paper Scissor` app into the Arduino App Lab.
 
@@ -59,7 +59,7 @@ And check that it's being added in the `app.yaml` file of the app.
 ![app.yaml file with the custom model](assets/img/app-yaml-with-custom-model.png)
 
 
-### Step 3: Start the App
+### Step 3: Start the app
 
 Launch the Arduino App Lab in your local machine and get into your Arduino UNO Q.
 
@@ -68,13 +68,13 @@ Go to `My Apps` and you may see the `Rock Paper Scissors` application there. Cli
 Alternatively, via SSH you can start the application using the Arduino App Lab CLI.
 
 ```bash
-arduino-app-cli app start user:RPS-game
+arduino-app-cli app start user:rock-paper-scissors-game
 ```
 
 Once successfully started, navigate to `http://<device-ip>:5001` in your browser and start playing!
 
 
-### Game Flow
+### Game flow
 
 1. Show your hand gesture (rock, paper, or scissors) to the camera.
 2. The detection panel on the left shows what the model sees in real-time after running inference on a local object detection Edge Impulse model.
@@ -95,29 +95,13 @@ All settings are in [python/main.py](python/main.py) at the top:
 | `RESULT_HOLD_SECS` | `3` | How long the result stays on screen |
 
 
-### Changing the Model
+### Improving the model
 
 In case that you want to create your own object detection model using [Edge Impulse](https://edgeimp.com/edgeai). 
 
-Collect data, label it and train the neural network. Test it in Edge Impulse and when you will feel confident, deploy it in your computer as an Arduino UNO Q model (or Linux aarch64). 
+Collect data, label it and train the neural network. Test it in Edge Impulse and when you will feel confident, deploy it as an Arduino UNO Q model or Linux aarch64. 
 
-Get the `eim` file  and copy it into the Arduino UNO Q.
-
-```bash
-scp new-model.eim arduino@<device-ip>:/home/arduino/.arduino-bricks/ei-models/
-ssh arduino@<device-ip> "chmod +x /home/arduino/.arduino-bricks/ei-models/new-model.eim"
-```
-
-Edit `app.yaml` and update the `EI_OBJ_DETECTION_MODEL` path:
-
-```yaml
-bricks:
-- arduino:video_object_detection: {
-    variables: {
-      EI_OBJ_DETECTION_MODEL: /home/arduino/.arduino-bricks/ei-models/new-model.eim
-    }
-  }
-```
+Then follow the same instructions that you performed to add it to the app's brick.
 
 
 ## Become an Edge Impulse expert
