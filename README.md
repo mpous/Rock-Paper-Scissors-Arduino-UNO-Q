@@ -17,7 +17,7 @@ The camera detects your hand gesture (rock, paper, or scissors) via machine lear
 
 ### Step 1: Transfer the app
 
-Clone this repository to your local machine.
+Clone [this repository](https://github.com/edgeimpulse/example-rock-paper-scissors-Arduino-UNO-Q) to your local machine.
 
 Copy the entire `Rock Paper Scissors` folder to the Arduino UNO Q board:
 
