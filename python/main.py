@@ -201,7 +201,12 @@ def handle_detections(detections):
         label = k.lower()
         if label not in VALID_LABELS:
             continue
-        conf = v.get("confidence") if isinstance(v, dict) else v
+        if isinstance(v, dict):
+            conf = v.get("confidence")
+        elif isinstance(v, list):
+            conf = v[0].get("confidence") if v and isinstance(v[0], dict) else None
+        else:
+            conf = v
         if conf is not None and conf >= CONFIDENCE_THRESHOLD:
             valid[label] = conf
     if valid:

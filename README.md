@@ -13,8 +13,7 @@ The camera detects your hand gesture (rock, paper, or scissors) via machine lear
 
 - Arduino UNO Q with Arduino App Lab
 - USB camera connected to the board
-- Edge Impulse `.eim` model trained to detect `rock`, `paper`, and `scissors` as you can find on the `models` folder.
-- Alternatively, [train your own Edge Impulse model here](https://edgeimp.com/edgeai) (it's free).
+- [Edge Impulse](https://edgeimpulse.com/) machine learning model trained to detect `rock`, `paper`, and `scissors` as you can find in this public project [here](https://studio.edgeimpulse.com/public/903134/live). Clone it and re-train it to improve the accuracy with your light and background.
 
 ### Step 1: Transfer the App
 
@@ -26,14 +25,39 @@ Copy the entire `Rock Paper Scissors` folder to the Arduino UNO Q board:
 scp -r Rock-Paper-Scissors-Arduino-UNO-Q/ arduino@<device-ip>:/home/arduino/ArduinoApps/RPS-game
 ```
 
+or use the Arduino App Lab `Create new App` button in the `My Apps` section and import the application.
+
+![Create new app](assets/img/arduino-app-lab-create-new-app.png)
+
+
 ### Step 2: Deploy the Model
 
-Copy your Edge Impulse model and make it executable:
+Get into the `Rock Paper Scissor` app into the Arduino App Lab.
 
-```bash
-scp rcp-model.eim arduino@<device-ip>:/home/arduino/.arduino-bricks/ei-models/
-ssh arduino@<device-ip> "chmod +x /home/arduino/.arduino-bricks/ei-models/rcp-model.eim"
-```
+Click in the Brick `Video Object Detection` and then click `Train new AI model` in the bottom.
+
+![Train new AI model](assets/img/bricks-ai-models.png)
+
+Log In into your Arduino account and the Edge Impulse account and then train your own `Rock Paper Scissors` model or clone [this public project](https://studio.edgeimpulse.com/public/903134/live) and re-train it.
+
+![Edge Impulse Studio project](assets/img/edge-impulse-project.png)
+
+![Add new images into the Training dataset](assets/img/add-new-images.png)
+
+![Create the Impulse](assets/img/create-the-impulse.png)
+
+![Train the model](assets/img/train-the-model.png)
+
+Go to deploy the model as `Arduino UNO Q` or as `Linux aarch64`. 
+
+![Deploy the model as Arduino UNO Q or Linux aarch64](assets/img/edge-impulse-project.png)
+
+Then the deployed models will appear in the brick of the Arduino App Lab when you will go to the `AI models` tab. Select the `Rock paper scissors` model.
+
+And check that it's being added in the `app.yaml` file of the app.
+
+![app.yaml file with the custom model](assets/img/app-yaml-with-custom-model.png)
+
 
 ### Step 3: Start the App
 
